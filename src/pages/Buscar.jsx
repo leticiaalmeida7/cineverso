@@ -1,89 +1,127 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SearchBar from "../components/SearchBar";
 import MovieGrid from "../components/MovieGrid";
-
-const movies = [
-    {
-        id: 1,
-        title: "Interestelar",
-        poster: "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg",
-        rating: "8.4",
-        type: "Filme",
-    },
-    {
-        id: 2,
-        title: "Duna: Parte Dois",
-        poster: "https://image.tmdb.org/t/p/w500/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg",
-        rating: "8.2",
-        type: "Filme",
-    },
-];
+import EmptyState from "../components/EmptyState";
 
 function Buscar() {
-    const [search, setSearch] = useState("");
-    const [searched, setSearched] = useState(false);
+  const [search, setSearch] = useState("");
+  const [searched, setSearched] = useState(false);
+  const [movies, setMovies] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-    function handleSearch() {
-        setSearched(true);
+  useEffect(() => {
+    if (!searched || !search.trim()) {
+      return;
     }
 
-    const filteredMovies = movies.filter((movie) =>
-        movie.title.toLowerCase().includes(search.toLowerCase()),
-    );
+    async function fetchMovies() {
+      try {
+        setLoading(true);
+        setError("");
 
-    return (
-        <main className="min-h-screen bg-[#0b1020]">
-            <section className="mx-auto max-w-7xl px-6 py-12">
-                <div className="mb-10">
-                    <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-indigo-400">
-                        Descobrir
-                    </p>
+        const response = await fetch(
+          `https://api.themoviedb.org/3/search/multi?query=${encodeURIComponent(search)}&language=pt-BR`,
+          {
+            headers: {
+              Authorization: `Bearer ${import.meta.env.VITE_TMDB_TOKEN}`,
+              accept: "application/json",
+            },
+          },
+        );
 
-                    <h1 className="text-4xl font-bold text-white">
-                        Buscar
-                    </h1>
+        if (!response.ok) {
+          throw new Error("Não foi possível realizar a busca.");
+        }
 
-                    <p className="mt-3 text-gray-400">
-                        Procure por um filme ou série.
-                    </p>
-                </div>
+        const data = await response.json();
 
-                <SearchBar
-                    value={search}
-                    onChange={setSearch}
-                    onSearch={handleSearch}
-                />
+        const formattedMovies = data.results
+          .filter(
+            (movie) =>
+              (movie.media_type === "movie" || movie.media_type === "tv") &&
+              movie.poster_path,
+          )
+          .map((movie) => ({
+            id: movie.id,
+            title: movie.title || movie.name,
+            poster: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
+            rating: movie.vote_average
+              ? movie.vote_average.toFixed(1)
+              : "Sem avaliação",
+            type: movie.media_type === "tv" ? "Série" : "Filme",
+          }));
 
-                <div className="mt-12">
-                    {!searched ? (
-                        <div className="border-t border-white/10 pt-8">
-                            <p className="text-sm text-gray-500">
-                                Digite um título para começar sua busca.
-                            </p>
-                        </div>
-                    ) : filteredMovies.length === 0 ? (
-                        <div className="border-t border-white/10 pt-8">
-                            <h2 className="text-xl font-semibold text-white">
-                                Nenhum resultado encontrado
-                            </h2>
+        setMovies(formattedMovies);
+      } catch (error) {
+        console.error(error);
+        setError("Não foi possível realizar a busca.");
+        setMovies([]);
+      } finally {
+        setLoading(false);
+      }
+    }
 
-                            <p className="mt-2 text-sm text-gray-500">
-                                Tente pesquisar usando outro nome.
-                            </p>
-                        </div>
-                    ) : (
-                        <>
-                            <h2 className="mb-6 text-2xl font-bold text-white">
-                                Resultados
-                            </h2>
+    fetchMovies();
+  }, [searched, search]);
 
-                            <MovieGrid movies={filteredMovies} />
-                        </>
-                    )}
-                </div>
-            </section>
-        </main>
-    );
+  function handleSearch() {
+    if (!search.trim()) {
+      return;
+    }
+
+    setSearched(true);
+  }
+
+  return (
+    <main className="min-h-screen bg-[#0b1020]">
+      <section className="mx-auto max-w-7xl px-6 py-12">
+        <div className="mb-10">
+          <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-indigo-400">
+            Descobrir
+          </p>
+
+          <h1 className="text-4xl font-bold text-white">
+            Buscar
+          </h1>
+
+          <p className="mt-3 text-gray-400">
+            Procure por um filme ou série.
+          </p>
+        </div>
+
+        <SearchBar value={search} onChange={setSearch} onSearch={handleSearch} />
+
+        <div className="mt-12">
+          {!searched ? (
+            <EmptyState message="Digite um título para começar sua busca." />
+          ) : loading ? (
+            <div className="border-t border-white/10 pt-8">
+              <p className="text-sm text-gray-400">
+                Buscando títulos...
+              </p>
+            </div>
+          ) : error ? (
+            <div className="border-t border-white/10 pt-8">
+              <p className="text-sm text-red-400">
+                {error}
+              </p>
+            </div>
+          ) : movies.length === 0 ? (
+            <EmptyState message="Nenhum resultado encontrado. Tente pesquisar usando outro nome." />
+          ) : (
+            <>
+              <h2 className="mb-6 text-2xl font-bold text-white">
+                Resultados
+              </h2>
+
+              <MovieGrid movies={movies} />
+            </>
+          )}
+        </div>
+      </section>
+    </main>
+  );
 }
 
 export default Buscar;

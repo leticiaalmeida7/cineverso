@@ -1,87 +1,111 @@
+import { useEffect, useState } from "react";
 import MovieGrid from "../components/MovieGrid";
-
-const movies = [
-    {
-        id: 7,
-        title: "Interestelar",
-        poster: "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg",
-        rating: "8.4",
-        type: "Filme",
-    },
-    {
-        id: 8,
-        title: "Duna: Parte Dois",
-        poster: "https://image.tmdb.org/t/p/w500/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg",
-        rating: "8.2",
-        type: "Filme",
-    },
-    {
-        id: 9,
-        title: "Oppenheimer",
-        poster: "https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg",
-        rating: "8.1",
-        type: "Filme",
-    },
-    {
-        id: 10,
-        title: "A Origem",
-        poster: "https://image.tmdb.org/t/p/w500/oYuLEt3zVCKq57qu2F8dT7NIa6f.jpg",
-        rating: "8.4",
-        type: "Filme",
-    },
-    {
-        id: 11,
-        title: "The Last of Us",
-        poster: "https://image.tmdb.org/t/p/w500/uKvVjHNqB5VmOrdxqAt2F7J78ED.jpg",
-        rating: "8.6",
-        type: "Série",
-    },
-    {
-        id: 12,
-        title: "Stranger Things",
-        poster: "https://image.tmdb.org/t/p/w500/49WJfeN0moxb9IPfGn8AIqMGskD.jpg",
-        rating: "8.6",
-        type: "Série",
-    },
-];
+import EmptyState from "../components/EmptyState";
 
 function Explorar() {
-    return (
-        <main className="min-h-screen bg-[#0b1020]">
-            <section className="mx-auto max-w-7xl px-6 py-12">
-                <div className="mb-10">
-                    <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-indigo-400">
-                        Catálogo
-                    </p>
+  const [movies, setMovies] = useState([]);
+  const [filter, setFilter] = useState("Todos");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-                    <h1 className="text-4xl font-bold text-white">
-                        Explorar
-                    </h1>
+  useEffect(() => {
+    async function fetchMovies() {
+      try {
+        setLoading(true);
+        setError("");
 
-                    <p className="mt-3 max-w-2xl text-gray-400">
-                        Encontre filmes e séries para adicionar à sua lista e acompanhar
-                        depois.
-                    </p>
-                </div>
+        const response = await fetch(
+          "https://api.themoviedb.org/3/trending/all/week?language=pt-BR",
+          {
+            headers: {
+              Authorization: `Bearer ${import.meta.env.VITE_TMDB_TOKEN}`,
+              accept: "application/json",
+            },
+          },
+        );
 
-                <div className="mb-10 flex flex-wrap gap-3">
-                    <button className="rounded-lg bg-white px-4 py-2 text-sm font-semibold text-[#0b1020]">
-                        Todos
-                    </button>
+        if (!response.ok) {
+          throw new Error("Não foi possível carregar os títulos.");
+        }
 
-                    <button className="rounded-lg border border-white/10 px-4 py-2 text-sm text-gray-400 transition hover:border-white/20 hover:text-white">
-                        Filmes
-                    </button>
+        const data = await response.json();
 
-                    <button className="rounded-lg border border-white/10 px-4 py-2 text-sm text-gray-400 transition hover:border-white/20 hover:text-white">
-                        Séries
-                    </button>
-                </div>
+        const formattedMovies = data.results
+          .filter((movie) => movie.poster_path)
+          .map((movie) => ({
+            id: movie.id,
+            title: movie.title || movie.name,
+            poster: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
+            rating: movie.vote_average
+              ? movie.vote_average.toFixed(1)
+              : "Sem avaliação",
+            type: movie.media_type === "tv" ? "Série" : "Filme",
+          }));
 
-                <MovieGrid movies={movies} />
-            </section>
-        </main>
-    );
+        setMovies(formattedMovies);
+      } catch (error) {
+        console.error(error);
+        setError("Não foi possível carregar o catálogo.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchMovies();
+  }, []);
+
+  const filteredMovies =
+    filter === "Todos"
+      ? movies
+      : movies.filter((movie) => movie.type === filter);
+
+  return (
+    <main className="min-h-screen bg-[#0b1020]">
+      <section className="mx-auto max-w-7xl px-6 py-12">
+        <div className="mb-10">
+          <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-indigo-400">
+            Catálogo
+          </p>
+
+          <h1 className="text-4xl font-bold text-white">
+            Explorar
+          </h1>
+
+          <p className="mt-3 max-w-2xl text-gray-400">
+            Encontre filmes e séries para adicionar à sua lista e acompanhar
+            depois.
+          </p>
+        </div>
+
+        <div className="mb-10 flex flex-wrap gap-3">
+          {["Todos", "Filme", "Série"].map((item) => (
+            <button key={item} onClick={() => setFilter(item)} className={ filter === item  ? "rounded-lg bg-white px-4 py-2 text-sm font-semibold text-[#0b1020]"  : "rounded-lg border border-white/10 px-4 py-2 text-sm text-gray-400 transition hover:border-white/20 hover:text-white" } >
+              {item === "Filme" ? "Filmes" : item === "Série" ? "Séries" : item}
+            </button> ))}
+        </div>
+
+        {loading && (
+          <p className="text-sm text-gray-400">
+            Carregando catálogo...
+          </p>
+        )}
+
+        {error && (
+          <p className="text-sm text-red-400">
+            {error}
+          </p>
+        )}
+
+        {!loading && !error && filteredMovies.length === 0 && (
+          <EmptyState message="Nenhum título encontrado." />
+        )}
+
+        {!loading && !error && filteredMovies.length > 0 && (
+          <MovieGrid movies={filteredMovies} />
+        )}
+      </section>
+    </main>
+  );
 }
 
 export default Explorar;
