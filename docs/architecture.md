@@ -1,42 +1,58 @@
-# Architecture — CineTrack
+# Architecture — Cineverso
 
 ## 1. Visão Geral
 
-O CineTrack será desenvolvido como uma aplicação web responsiva utilizando React.
+O Cineverso é uma aplicação web responsiva desenvolvida utilizando React.
 
-A aplicação será organizada em páginas e componentes reutilizáveis. O React Router será utilizado para controlar a navegação entre as páginas e para criar a rota dinâmica de detalhes dos filmes e séries.
+A aplicação é organizada em páginas e componentes reutilizáveis. O React Router é utilizado para controlar a navegação entre as páginas e para criar a rota dinâmica de detalhes dos filmes e séries.
 
-Os dados dos conteúdos serão obtidos através da API do TMDB utilizando efeitos do React (`useEffect`).
+Os dados dos conteúdos são obtidos através da API do TMDB utilizando efeitos do React (`useEffect`).
 
-A interação do usuário será controlada principalmente através de estados do React (`useState`).
+As interações do usuário são controladas principalmente através de estados do React (`useState`).
 
-Os conteúdos adicionados à lista, seus respectivos status e o progresso dos episódios serão armazenados no `localStorage` do navegador.
+Os conteúdos adicionados à lista, seus respectivos status e o progresso dos episódios são armazenados no `localStorage` do navegador.
 
-A aplicação terá um layout principal compartilhado entre as páginas, contendo cabeçalho, área de conteúdo e rodapé.
+A aplicação possui um layout principal compartilhado entre as páginas, contendo cabeçalho, área de conteúdo e rodapé.
 
 ---
 
 ## 2. Estrutura de Pastas
 
-```cine-track
-src/
-├── components/
-│   ├── Header.jsx
-│   ├── Footer.jsx
-│   ├── MovieCard.jsx
-│   ├── MovieGrid.jsx
-│   ├── SearchBar.jsx
-│   ├── StatusButton.jsx
-│   ├── Loading.jsx
-│   └── EmptyState.jsx
+```text
+cineverso/
+├── docs/
+│   ├── references/
+│   │   └── imagens/
+│   │       ├── netflix.png
+│   │       ├── sofa-time.png
+│   │       └── letterboxd.png
+│   ├── references.md
+│   ├── requirements.md
+│   └── architecture.md
 │
-├── pages/
-│   ├── Home.jsx
-│   ├── Explorar.jsx
-│   ├── Buscar.jsx
-│   ├── Detalhes.jsx
-│   └── MinhaLista.jsx
+├── src/
+│   ├── components/
+│   │   ├── Header.jsx
+│   │   ├── Footer.jsx
+│   │   ├── MovieCard.jsx
+│   │   ├── MovieGrid.jsx
+│   │   ├── SearchBar.jsx
+│   │   ├── StatusButton.jsx
+│   │   ├── Loading.jsx
+│   │   └── EmptyState.jsx
+│   │
+│   ├── pages/
+│   │   ├── Home.jsx
+│   │   ├── Explorar.jsx
+│   │   ├── Buscar.jsx
+│   │   ├── Detalhes.jsx
+│   │   └── MinhaLista.jsx
+│   │
+│   ├── App.jsx
+│   ├── main.jsx
+│   └── index.css
 │
-├── App.jsx
-├── main.jsx
-└── index.css
+├── .gitignore
+├── package.json
+├── package-lock.json
+└── README.md

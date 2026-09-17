@@ -1,10 +1,10 @@
-# Requirements — CineTrack
+# Requirements — Cineverso
 
 ## 1. Visão do Produto
 
 ### Nome
 
-CineTrack
+Cineverso
 
 ### Problema
 
@@ -18,21 +18,21 @@ Pessoas que assistem regularmente a filmes e séries e desejam organizar seu con
 
 ### Proposta de solução
 
-O CineTrack será uma plataforma web responsiva que reúne descoberta de filmes e séries e organização pessoal.
+O Cineverso é uma plataforma web responsiva que reúne descoberta de filmes e séries e organização pessoal.
 
-O usuário poderá pesquisar conteúdos, visualizar suas informações, adicionar títulos à sua lista e definir o status de cada conteúdo como "Quero assistir", "Assistindo" ou "Concluído".
+O usuário pode pesquisar conteúdos, visualizar suas informações, adicionar títulos à sua lista e definir o status de cada conteúdo como "Quero assistir", "Assistindo" ou "Concluído".
 
-Para séries, o usuário também poderá acompanhar seu progresso através do registro dos episódios assistidos.
+Para séries, o usuário também pode acompanhar seu progresso através do registro dos episódios assistidos.
 
-As informações dos filmes e séries serão obtidas através da API do TMDB.
+As informações dos filmes e séries são obtidas através da API do TMDB.
 
 ---
 
 ## 2. Objetivo do MVP
 
-O objetivo do MVP é criar uma plataforma que permita ao usuário descobrir filmes e séries e organizar seu acompanhamento em um único lugar.
+O objetivo do MVP é oferecer uma plataforma que permita ao usuário descobrir filmes e séries e organizar seu acompanhamento em um único lugar.
 
-Ao final do projeto, o usuário deverá conseguir:
+O usuário consegue:
 
 - visualizar filmes e séries;
 - pesquisar por títulos;
@@ -83,12 +83,12 @@ Como usuário, quero visualizar todos os conteúdos que salvei para acompanhar m
 ### F01 — Descoberta de filmes e séries
 
 **Descrição:**  
-A aplicação deverá apresentar filmes e séries obtidos através da API do TMDB para que o usuário possa descobrir novos conteúdos.
+A aplicação apresenta filmes e séries obtidos através da API do TMDB para que o usuário possa descobrir novos conteúdos.
 
 **Critérios de aceitação:**
 
 - [ ] A aplicação deve consumir dados da API do TMDB.
-- [ ] Os conteúdos devem apresentar pelo menos título, poster e avaliação.
+- [ ] Os conteúdos devem apresentar pelo menos título, pôster e avaliação.
 - [ ] O usuário deve conseguir selecionar um conteúdo.
 - [ ] A aplicação deve apresentar um estado de carregamento enquanto os dados são buscados.
 - [ ] A aplicação deve apresentar uma mensagem quando não houver conteúdos disponíveis.
@@ -102,11 +102,12 @@ A aplicação deverá apresentar filmes e séries obtidos através da API do TMD
 - [ ] Vazio
 - [ ] Erro
 
+---
 
 ### F02 — Pesquisa de conteúdos
 
 **Descrição:**  
-O usuário poderá pesquisar filmes e séries através de um campo de busca.
+O usuário pode pesquisar filmes e séries através de um campo de busca.
 
 **Critérios de aceitação:**
 
@@ -126,17 +127,18 @@ O usuário poderá pesquisar filmes e séries através de um campo de busca.
 - [ ] Vazio
 - [ ] Erro
 
+---
 
 ### F03 — Detalhes do conteúdo
 
 **Descrição:**  
-A aplicação deverá possuir uma página específica para apresentar as informações de um filme ou série selecionado.
+A aplicação possui uma página específica para apresentar as informações de um filme ou série selecionado.
 
 **Critérios de aceitação:**
 
 - [ ] A página deve utilizar uma rota dinâmica.
 - [ ] O conteúdo deve ser identificado através de seu ID.
-- [ ] Deve apresentar poster.
+- [ ] Deve apresentar pôster.
 - [ ] Deve apresentar título.
 - [ ] Deve apresentar sinopse.
 - [ ] Deve apresentar avaliação.
@@ -150,11 +152,12 @@ A aplicação deverá possuir uma página específica para apresentar as informa
 - [ ] Sucesso
 - [ ] Erro
 
+---
 
-### F04 — Minha lista
+### F04 — Minha Lista
 
 **Descrição:**  
-O usuário poderá visualizar e organizar os filmes e séries adicionados à sua lista pessoal.
+O usuário pode visualizar e organizar os filmes e séries adicionados à sua lista pessoal.
 
 **Critérios de aceitação:**
 
@@ -171,11 +174,12 @@ O usuário poderá visualizar e organizar os filmes e séries adicionados à sua
 - [ ] Com conteúdo
 - [ ] Vazio
 
+---
 
 ### F05 — Status dos conteúdos
 
 **Descrição:**  
-O usuário poderá organizar seus conteúdos através de três status.
+O usuário pode organizar seus conteúdos através de três status.
 
 **Status disponíveis:**
 
@@ -191,11 +195,12 @@ O usuário poderá organizar seus conteúdos através de três status.
 - [ ] O status escolhido deve ser armazenado no navegador.
 - [ ] O status deve ser apresentado visualmente na lista.
 
+---
 
 ### F06 — Acompanhamento de episódios
 
 **Descrição:**  
-Para séries, o usuário poderá marcar episódios como assistidos e acompanhar seu progresso.
+Para séries, o usuário pode marcar episódios como assistidos e acompanhar seu progresso.
 
 **Critérios de aceitação:**
 
@@ -214,11 +219,12 @@ Para séries, o usuário poderá marcar episódios como assistidos e acompanhar 
 - [ ] Vazio
 - [ ] Erro
 
+---
 
 ### F07 — Responsividade
 
 **Descrição:**  
-A aplicação deverá adaptar sua interface para diferentes tamanhos de tela.
+A aplicação adapta sua interface para diferentes tamanhos de tela.
 
 **Critérios de aceitação:**
 
@@ -258,19 +264,19 @@ Estado apresentado quando ocorre uma falha na comunicação com a API ou em uma 
 
 ### R01 — Adição à lista
 
-O usuário poderá adicionar um filme ou série à sua lista pessoal.
+O usuário pode adicionar um filme ou série à sua lista pessoal.
 
 ### R02 — Conteúdo duplicado
 
-Um mesmo conteúdo não poderá ser adicionado mais de uma vez à lista.
+Um mesmo conteúdo não pode ser adicionado mais de uma vez à lista.
 
 ### R03 — Status inicial
 
-Todo novo conteúdo adicionado receberá inicialmente o status "Quero assistir".
+Todo novo conteúdo adicionado recebe inicialmente o status "Quero assistir".
 
 ### R04 — Alteração de status
 
-O usuário poderá alterar o status entre:
+O usuário pode alterar o status entre:
 
 - Quero assistir
 - Assistindo
@@ -278,29 +284,29 @@ O usuário poderá alterar o status entre:
 
 ### R05 — Remoção
 
-O usuário poderá remover um conteúdo da sua lista.
+O usuário pode remover um conteúdo da sua lista.
 
 ### R06 — Persistência
 
-A lista pessoal e o progresso dos episódios deverão permanecer disponíveis após a atualização da página.
+A lista pessoal e o progresso dos episódios permanecem disponíveis após a atualização da página.
 
-Para o MVP, essas informações serão armazenadas no `localStorage` do navegador.
+Para o MVP, essas informações são armazenadas no `localStorage` do navegador.
 
 ### R07 — Progresso de séries
 
-O progresso será calculado com base na quantidade de episódios marcados como assistidos em relação à quantidade total de episódios disponíveis.
+O progresso é calculado com base na quantidade de episódios marcados como assistidos em relação à quantidade total de episódios disponíveis na temporada selecionada.
 
 ### R08 — Dados dos conteúdos
 
-As informações apresentadas sobre filmes e séries serão obtidas através da API do TMDB.
+As informações apresentadas sobre filmes e séries são obtidas através da API do TMDB.
 
 ### R09 — Identificação dos conteúdos
 
-Cada conteúdo deverá possuir uma página de detalhes acessível através de seu identificador.
+Cada conteúdo possui uma página de detalhes acessível através de seu identificador.
 
 ### R10 — Responsividade
 
-As principais funcionalidades da aplicação deverão estar disponíveis independentemente do tamanho da tela.
+As principais funcionalidades da aplicação estão disponíveis independentemente do tamanho da tela.
 
 ---
 
@@ -330,12 +336,12 @@ As seguintes funcionalidades não fazem parte do MVP:
 
 ### TMDB API
 
-O CineTrack utilizará a API do The Movie Database (TMDB) para obter informações sobre filmes e séries.
+O Cineverso utiliza a API do The Movie Database (TMDB) para obter informações sobre filmes e séries.
 
-A API será utilizada para obter informações como:
+A API é utilizada para obter informações como:
 
 - títulos;
-- posters;
+- pôsteres;
 - sinopses;
 - avaliações;
 - datas de lançamento;
@@ -343,39 +349,40 @@ A API será utilizada para obter informações como:
 - temporadas;
 - episódios.
 
-A aplicação React realizará requisições à API utilizando os recursos disponíveis para o projeto.
+A aplicação React realiza requisições à API utilizando os recursos disponíveis para o projeto.
 
 ---
 
 ## 9. Persistência
 
-O MVP utilizará o `localStorage` do navegador para armazenar:
+O `localStorage` é utilizado para manter os dados pessoais do usuário no navegador.
+
+São armazenados:
 
 - conteúdos adicionados à lista;
 - status dos conteúdos;
-- episódios marcados como assistidos;
-- progresso das séries.
+- episódios assistidos.
 
-Não será utilizado banco de dados ou sistema de autenticação neste MVP.
+A persistência permite que essas informações continuem disponíveis após a atualização da página.
 
 ---
 
 ## 10. Critérios Gerais de Aceitação
 
-O MVP será considerado funcional quando:
+O MVP é considerado funcional quando:
 
-- [ ] A aplicação executar corretamente em React.
-- [ ] O usuário conseguir navegar entre as páginas.
-- [ ] A aplicação possuir múltiplas rotas.
-- [ ] Existir pelo menos uma rota dinâmica.
-- [ ] A aplicação consumir a API do TMDB.
-- [ ] O usuário conseguir pesquisar filmes e séries.
-- [ ] O usuário conseguir visualizar os detalhes de um conteúdo.
-- [ ] O usuário conseguir adicionar conteúdos à sua lista.
-- [ ] O usuário conseguir alterar o status dos conteúdos.
-- [ ] O usuário conseguir remover conteúdos da lista.
-- [ ] O usuário conseguir acompanhar episódios de séries.
-- [ ] Os dados da lista permanecerem após atualizar a página.
-- [ ] A interface funcionar em desktop, tablet e dispositivos móveis.
-- [ ] A aplicação utilizar componentes reutilizáveis.
-- [ ] A aplicação utilizar estados de carregamento, sucesso, vazio e erro quando necessários.
+- [ ] A aplicação executa corretamente em React.
+- [ ] O usuário consegue navegar entre as páginas.
+- [ ] A aplicação possui múltiplas rotas.
+- [ ] Existe pelo menos uma rota dinâmica.
+- [ ] A aplicação consome a API do TMDB.
+- [ ] O usuário consegue pesquisar filmes e séries.
+- [ ] O usuário consegue visualizar os detalhes de um conteúdo.
+- [ ] O usuário consegue adicionar conteúdos à sua lista.
+- [ ] O usuário consegue alterar o status dos conteúdos.
+- [ ] O usuário consegue remover conteúdos da lista.
+- [ ] O usuário consegue acompanhar episódios de séries.
+- [ ] Os dados da lista permanecem após atualizar a página.
+- [ ] A interface funciona em desktop, tablet e dispositivos móveis.
+- [ ] A aplicação utiliza componentes reutilizáveis.
+- [ ] A aplicação utiliza estados de carregamento, sucesso, vazio e erro quando necessários.
