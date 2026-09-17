@@ -7,7 +7,7 @@ function Header() {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
         <NavLink to="/" className="flex items-center gap-2">
           <Film size={26} strokeWidth={2} />
-          <span className="font-['Space_Grotesk'] text-xl font-bold">CineTrack</span>
+          <span className="font-['Space_Grotesk'] text-xl font-bold">CineVerso</span>
         </NavLink>
 
         <nav className="hidden items-center gap-8 md:flex">
