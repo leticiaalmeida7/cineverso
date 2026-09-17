@@ -2,8 +2,10 @@ import { Star } from "lucide-react";
 import { Link } from "react-router-dom";
 
 function MovieCard({ id, title, poster, rating, type }) {
+  const mediaType = type === "Série" ? "tv" : "movie";
+
   return (
-    <Link to={`/titulo/${id}`} className="group block w-40 shrink-0 sm:w-45">
+    <Link to={`/titulo/${id}?tipo=${mediaType}`} className="group block w-40 shrink-0 sm:w-45">
       <div className="relative overflow-hidden rounded-xl bg-[#171d31]">
         {poster ? (
           <img src={poster} alt={`Pôster de ${title}`} className="aspect-2/3 w-full object-cover transition duration-300 group-hover:scale-105"/>

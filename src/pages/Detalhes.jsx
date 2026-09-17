@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { ArrowLeft, Star, Plus, Check } from "lucide-react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 
 function Detalhes() {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -17,40 +18,27 @@ function Detalhes() {
       try {
         setLoading(true);
         setError("");
+        setMovie(null);
+        setSeason(null);
+        setEpisodes([]);
 
-        let response = await fetch(
-          `https://api.themoviedb.org/3/movie/${id}?language=pt-BR`,
-          {
-            headers: {
-              Authorization: `Bearer ${import.meta.env.VITE_TMDB_TOKEN}`,
-              accept: "application/json",
-            },
+        const type = searchParams.get("tipo") || "movie";
+        const endpoint = type === "tv" ? "tv" : "movie";
+        const contentType = type === "tv" ? "Série" : "Filme";
+
+        const response = await fetch(`https://api.themoviedb.org/3/${endpoint}/${id}?language=pt-BR`, {
+          headers: {
+            Authorization: `Bearer ${import.meta.env.VITE_TMDB_TOKEN}`,
+            accept: "application/json",
           },
-        );
-
-        let type = "Filme";
-
-        if (!response.ok) {
-          response = await fetch(
-            `https://api.themoviedb.org/3/tv/${id}?language=pt-BR`,
-            {
-              headers: {
-                Authorization: `Bearer ${import.meta.env.VITE_TMDB_TOKEN}`,
-                accept: "application/json",
-              },
-            },
-          );
-
-          type = "Série";
-        }
+        });
 
         if (!response.ok) {
           throw new Error("Não foi possível carregar o título.");
         }
 
         const data = await response.json();
-
-        setMovie({ ...data, type });
+        setMovie({ ...data, type: contentType });
 
         const savedMovies = localStorage.getItem("cineTrackMinhaLista");
 
@@ -59,25 +47,21 @@ function Detalhes() {
           const savedMovie = movies.find((item) => item.id === data.id);
 
           setAdded(Boolean(savedMovie));
-
-          if (savedMovie?.watchedEpisodes) {
-            setWatchedEpisodes(savedMovie.watchedEpisodes);
-          }
+          setWatchedEpisodes(savedMovie?.watchedEpisodes || []);
+        } else {
+          setWatchedEpisodes([]);
         }
 
-        if (type === "Série" && data.seasons?.length > 0) {
+        if (type === "tv" && data.seasons?.length > 0) {
           const firstSeason = data.seasons.find((item) => item.season_number > 0) || data.seasons[0];
           setSeason(firstSeason);
 
-          const seasonResponse = await fetch(
-            `https://api.themoviedb.org/3/tv/${id}/season/${firstSeason.season_number}?language=pt-BR`,
-            {
-              headers: {
-                Authorization: `Bearer ${import.meta.env.VITE_TMDB_TOKEN}`,
-                accept: "application/json",
-              },
+          const seasonResponse = await fetch(`https://api.themoviedb.org/3/tv/${id}/season/${firstSeason.season_number}?language=pt-BR`, {
+            headers: {
+              Authorization: `Bearer ${import.meta.env.VITE_TMDB_TOKEN}`,
+              accept: "application/json",
             },
-          );
+          });
 
           if (seasonResponse.ok) {
             const seasonData = await seasonResponse.json();
@@ -93,27 +77,20 @@ function Detalhes() {
     }
 
     fetchMovie();
-  }, [id]);
+  }, [id, searchParams]);
 
   async function handleSeasonChange(event) {
     const seasonNumber = Number(event.target.value);
-
-    const selectedSeason = movie.seasons.find(
-      (item) => item.season_number === seasonNumber,
-    );
-
+    const selectedSeason = movie.seasons.find((item) => item.season_number === seasonNumber);
     setSeason(selectedSeason);
 
     try {
-      const response = await fetch(
-        `https://api.themoviedb.org/3/tv/${id}/season/${seasonNumber}?language=pt-BR`,
-        {
-          headers: {
-            Authorization: `Bearer ${import.meta.env.VITE_TMDB_TOKEN}`,
-            accept: "application/json",
-          },
+      const response = await fetch(`https://api.themoviedb.org/3/tv/${id}/season/${seasonNumber}?language=pt-BR`, {
+        headers: {
+          Authorization: `Bearer ${import.meta.env.VITE_TMDB_TOKEN}`,
+          accept: "application/json",
         },
-      );
+      });
 
       if (!response.ok) {
         throw new Error("Não foi possível carregar os episódios.");
@@ -140,9 +117,7 @@ function Detalhes() {
     const movies = savedMovies ? JSON.parse(savedMovies) : [];
 
     const updatedMovies = movies.map((item) =>
-      item.id === movie.id
-        ? { ...item, watchedEpisodes: updatedEpisodes }
-        : item,
+      item.id === movie.id ? { ...item, watchedEpisodes: updatedEpisodes } : item,
     );
 
     localStorage.setItem("cineTrackMinhaLista", JSON.stringify(updatedMovies));
@@ -155,7 +130,6 @@ function Detalhes() {
 
     const savedMovies = localStorage.getItem("cineTrackMinhaLista");
     const movies = savedMovies ? JSON.parse(savedMovies) : [];
-
     const alreadyExists = movies.some((item) => item.id === movie.id);
 
     if (alreadyExists) {
@@ -175,7 +149,7 @@ function Detalhes() {
       rating: movie.vote_average?.toFixed(1),
       releaseDate,
       type: movie.type,
-      genres: movie.genres.map((genre) => genre.name),
+      genres: movie.genres?.map((genre) => genre.name) || [],
       synopsis: movie.overview,
       status: "Quero assistir",
       watchedEpisodes: [],
@@ -207,7 +181,6 @@ function Detalhes() {
           </Link>
 
           <h1 className="text-2xl font-bold text-white">Não foi possível carregar o título</h1>
-
           <p className="mt-3 text-gray-500">{error}</p>
         </section>
       </main>
@@ -225,9 +198,7 @@ function Detalhes() {
     ? Math.round(
         (episodes.filter((episode) =>
           watchedEpisodes.includes(`${movie.id}-${season?.season_number}-${episode.episode_number}`),
-        ).length /
-          episodes.length) *
-          100,
+        ).length / episodes.length) * 100,
       )
     : 0;
 
@@ -242,10 +213,12 @@ function Detalhes() {
         <div className="grid gap-10 md:grid-cols-[280px_1fr] lg:grid-cols-[320px_1fr]">
           <div>
             {poster ? (
-              <img src={poster} alt={`Pôster de ${title}`} className="w-full max-w-[320px] rounded-xl object-cover shadow-2xl" /> ) : (
-              <div className="flex aspect-2/3 w-full max-w-[320px] items-center justify-center rounded-xl bg-[#171d31] text-gray-500">
+              <img src={poster} alt={`Pôster de ${title}`} className="w-full max-w-[320px] rounded-xl object-cover shadow-2xl" />
+            ) : (
+              <div className="flex aspect-[2/3] w-full max-w-[320px] items-center justify-center rounded-xl bg-[#171d31] text-gray-500">
                 Sem pôster
-              </div>)}
+              </div>
+            )}
           </div>
 
           <div className="max-w-3xl">
@@ -254,15 +227,19 @@ function Detalhes() {
               <span>{releaseYear}</span>
 
               {movie.type === "Filme" && movie.runtime && (
-                <span>{Math.floor(movie.runtime / 60)}h {movie.runtime % 60}min</span>)}
+                <span>{Math.floor(movie.runtime / 60)}h {movie.runtime % 60}min</span>
+              )}
+
               {movie.type === "Série" && movie.number_of_seasons && (
-                <span>{movie.number_of_seasons} temporadas</span> )}
+                <span>{movie.number_of_seasons} temporadas</span>
+              )}
             </div>
 
             <h1 className="text-4xl font-bold text-white md:text-5xl">{title}</h1>
 
             {originalTitle && originalTitle !== title && (
-              <p className="mt-2 text-sm text-gray-500">{originalTitle}</p>)}
+              <p className="mt-2 text-sm text-gray-500">{originalTitle}</p>
+            )}
 
             <div className="mt-6 flex flex-wrap items-center gap-4">
               <div className="flex items-center gap-2 text-white">
@@ -270,26 +247,25 @@ function Detalhes() {
                 <span className="font-semibold">{rating}</span>
               </div>
 
-              <div className="flex flex-wrap gap-2"> {movie.genres?.map((genre) => (
-                  <span key={genre.id} className="rounded-md border border-white/10 px-3 py-1 text-xs text-gray-400"> {genre.name} </span> ))}
+              <div className="flex flex-wrap gap-2">
+                {movie.genres?.map((genre) => (
+                  <span key={genre.id} className="rounded-md border border-white/10 px-3 py-1 text-xs text-gray-400">
+                    {genre.name}
+                  </span>
+                ))}
               </div>
             </div>
 
             <div className="mt-8">
               <h2 className="text-xl font-semibold text-white">Sinopse</h2>
-
-              <p className="mt-3 leading-7 text-gray-400">
-                {movie.overview || "Sinopse não disponível."}
-              </p>
+              <p className="mt-3 leading-7 text-gray-400">{movie.overview || "Sinopse não disponível."}</p>
             </div>
 
             <button
               onClick={handleAddToList}
               disabled={added}
               className={`mt-8 flex items-center gap-2 rounded-lg px-5 py-3 text-sm font-semibold transition ${
-                added
-                  ? "bg-white/10 text-gray-300"
-                  : "bg-indigo-500 text-white hover:bg-indigo-400"
+                added ? "bg-white/10 text-gray-300" : "bg-indigo-500 text-white hover:bg-indigo-400"
               }`}
             >
               {added ? <Check size={19} /> : <Plus size={19} />}
@@ -301,16 +277,15 @@ function Detalhes() {
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                   <div>
                     <h2 className="text-2xl font-bold text-white">Episódios</h2>
-                    <p className="mt-1 text-sm text-gray-500">
-                      Acompanhe os episódios que você já assistiu.
-                    </p>
+                    <p className="mt-1 text-sm text-gray-500">Acompanhe os episódios que você já assistiu.</p>
                   </div>
 
-                  <select value={season?.season_number ?? ""} onChange={handleSeasonChange} className="rounded-lg border border-white/10 bg-[#12182a] px-4 py-2 text-sm text-gray-300 outline-none" >
-                    {movie.seasons .filter((item) => item.season_number > 0) .map((item) => (
-                        <option key={item.id} value={item.season_number}>
-                          Temporada {item.season_number}
-                        </option> ))}
+                  <select value={season?.season_number ?? ""} onChange={handleSeasonChange} className="rounded-lg border border-white/10 bg-[#12182a] px-4 py-2 text-sm text-gray-300 outline-none">
+                    {movie.seasons.filter((item) => item.season_number > 0).map((item) => (
+                      <option key={item.id} value={item.season_number}>
+                        Temporada {item.season_number}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
@@ -318,18 +293,12 @@ function Detalhes() {
                   <>
                     <div className="mt-6">
                       <div className="mb-2 flex items-center justify-between text-sm">
-                        <span className="text-gray-400">
-                          Progresso da temporada
-                        </span>
-
-                        <span className="text-white">
-                          {episodeProgress}%
-                        </span>
+                        <span className="text-gray-400">Progresso da temporada</span>
+                        <span className="text-white">{episodeProgress}%</span>
                       </div>
 
                       <div className="h-2 overflow-hidden rounded-full bg-white/10">
-                        <div className="h-full bg-indigo-500 transition-all"
-                          style={{ width: `${episodeProgress}%` }} />
+                        <div className="h-full bg-indigo-500 transition-all" style={{ width: `${episodeProgress}%` }} />
                       </div>
                     </div>
 
@@ -341,14 +310,18 @@ function Detalhes() {
                         return (
                           <div key={episode.id} className="flex items-center justify-between gap-4 border-b border-white/10 py-4">
                             <div className="min-w-0">
-                              <p className="text-sm font-semibold text-white"> Episódio {episode.episode_number} — {episode.name}  </p>
-
-                              <p className="mt-1 line-clamp-2 text-xs text-gray-500">
-                                {episode.overview || "Descrição não disponível."}
-                              </p>
+                              <p className="text-sm font-semibold text-white">Episódio {episode.episode_number} — {episode.name}</p>
+                              <p className="mt-1 line-clamp-2 text-xs text-gray-500">{episode.overview || "Descrição não disponível."}</p>
                             </div>
 
-                            <button onClick={() => handleEpisodeToggle(episode.episode_number)} className={`shrink-0 rounded-lg border px-3 py-2 text-xs font-semibold transition ${ watched ? "border-indigo-400/30 bg-indigo-500/10 text-indigo-300" : "border-white/10 text-gray-400 hover:border-white/20 hover:text-white" }`} >
+                            <button
+                              onClick={() => handleEpisodeToggle(episode.episode_number)}
+                              className={`shrink-0 rounded-lg border px-3 py-2 text-xs font-semibold transition ${
+                                watched
+                                  ? "border-indigo-400/30 bg-indigo-500/10 text-indigo-300"
+                                  : "border-white/10 text-gray-400 hover:border-white/20 hover:text-white"
+                              }`}
+                            >
                               {watched ? "Assistido" : "Marcar como assistido"}
                             </button>
                           </div>
